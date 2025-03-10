@@ -7,7 +7,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
 
 @Entity
-@NoArgsConstructor
-@Table(name = "regions")
-public class regions extends ModelBase {
+//@NoArgsConstructor
+@Table(name = "regions", schema = "java_spring_bot")
+public class Regions extends ModelBase {
+
+    public  Regions() {
+    }
 }

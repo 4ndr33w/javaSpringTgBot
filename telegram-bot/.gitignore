@@ -4,3 +4,7 @@ target/
 .gigaide/
 .idea/
 .mvn/
+
+src/main/resources/data.sql
+src/main/resources/application.properties
+src/main/resources/application.yaml

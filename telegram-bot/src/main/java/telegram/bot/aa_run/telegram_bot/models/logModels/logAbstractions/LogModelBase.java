@@ -8,18 +8,13 @@ import lombok.AllArgsConstructor;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.MappedSuperclass;
 
 import java.util.Date;
 
-@Getter
-@Setter
-@Builder
-@Embeddable
-@AllArgsConstructor
-@NoArgsConstructor
+@MappedSuperclass
 public class LogModelBase {
 
     @Id
@@ -36,4 +31,36 @@ public class LogModelBase {
     @Column(name = "created_at", columnDefinition = "timestamptz")
     protected Date createdAt;
 
+    public LogModelBase() {}
+    public LogModelBase(long id, String message, long telegramId, Date createdAt) {
+        this.id = id;
+        this.message = message;
+        this.telegramId = telegramId;
+        this.createdAt = createdAt;
+    }
+
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
+    }
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    public long getTelegramId() {
+        return telegramId;
+    }
+    public void setTelegramId(long telegramId) {
+        this.telegramId = telegramId;
+    }
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 }
