@@ -3,7 +3,7 @@ create schema java_spring_bot;
 create table java_spring_bot.competitors
 (
 id bigserial primary key,
-telegram_id bigint not null,
+telegram_id bigint not null unique,
 name text,
 gender character,
 company text,
@@ -39,7 +39,7 @@ create table java_spring_bot.errors
 (
 id bigserial primary key,
 message text,
-telegram_id bigint not null,
+telegram_id bigint not null unique,
 created_at timestamptz default now()
 );
 
@@ -47,7 +47,7 @@ create table java_spring_bot.replies
 (
 id bigserial primary key,
 message text,
-telegram_id bigint not null,
+telegram_id bigint not null unique,
 created_at timestamptz default now()
 );
 
@@ -55,7 +55,7 @@ create table java_spring_bot.results
 (
 id bigserial primary key,
 message text,
-telegram_id bigint not null,
+telegram_id bigint not null unique,
 created_at timestamptz default now(),
 total_result numeric,
 last_added_result numeric
@@ -64,7 +64,7 @@ last_added_result numeric
 create table java_spring_bot.users
 (
 id bigserial primary key,
-telegram_id bigint not null,
+telegram_id bigint not null unique,
 name text,
 full_user_name text,
 user_status integer default 0,
