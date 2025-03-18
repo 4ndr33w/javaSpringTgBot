@@ -31,6 +31,15 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-community-dialects</artifactId>
+			<version>6.6.1.Final</version>
+		</dependency>
+		<dependency>
 			<groupId>com.github.xabgesagtx</groupId>
 			<artifactId>telegram-spring-boot-starter</artifactId>
 			<version>0.26</version>

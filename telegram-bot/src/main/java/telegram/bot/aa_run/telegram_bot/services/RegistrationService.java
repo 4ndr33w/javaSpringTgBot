@@ -4,35 +4,49 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
-import telegram.bot.aa_run.telegram_bot.models.BotState;
+import telegram.bot.aa_run.telegram_bot.utils.Mapper;
 import telegram.bot.aa_run.telegram_bot.utils.UtilClass;
 import telegram.bot.aa_run.telegram_bot.utils.MarkupHandler;
+import telegram.bot.aa_run.telegram_bot.models.BotState;
 import telegram.bot.aa_run.telegram_bot.models.enums.MenuStep;
-import telegram.bot.aa_run.telegram_bot.models.CompetitorModel;
 import telegram.bot.aa_run.telegram_bot.models.enums.CompetitionType;
-import telegram.bot.aa_run.telegram_bot.models.companies.CompanyModel;
-import telegram.bot.aa_run.telegram_bot.models.abstractions.ModelBase;
 import telegram.bot.aa_run.telegram_bot.models.enums.ActiveCommandType;
-import telegram.bot.aa_run.telegram_bot.repositories.CompanyRepository;
+import telegram.bot.aa_run.telegram_bot.models.postgre.Cities;
+import telegram.bot.aa_run.telegram_bot.models.postgre.Companies;
+import telegram.bot.aa_run.telegram_bot.models.postgre.CompetitorModel;
+import telegram.bot.aa_run.telegram_bot.models.abstractions.ModelBase;
+import telegram.bot.aa_run.telegram_bot.repositories.sqlite.UserRepository;
+import telegram.bot.aa_run.telegram_bot.repositories.postgre.CityRepository;
+import telegram.bot.aa_run.telegram_bot.repositories.postgre.RegionRepository;
+import telegram.bot.aa_run.telegram_bot.repositories.postgre.CompanyRepository;
+import telegram.bot.aa_run.telegram_bot.repositories.postgre.CompetitorRepository;
 import telegram.bot.aa_run.telegram_bot.telegram.handlers.CommandHandler;
-import telegram.bot.aa_run.telegram_bot.repositories.CompaniesRepository;
-import telegram.bot.aa_run.telegram_bot.repositories.CompetitorRepository;
 
 @Service
 public class RegistrationService {
 
+    private final CityRepository cityRepository;
     private final CompanyRepository companyRepository;
-    private final CompaniesRepository companiesRepository;
+    private final RegionRepository regionRepository;
     private final CompetitorRepository competitorRepository;
+    private final UserRepository userRepository;
 
-    public RegistrationService(CompaniesRepository companiesRepository, CompanyRepository companyRepository, CompetitorRepository competitorRepository) {
+    public RegistrationService(RegionRepository regionRepository,
+                               CompanyRepository companyRepository,
+                               CompetitorRepository competitorRepository,
+                               CityRepository cityRepository,
+                               UserRepository userRepository) {
+
+        this.cityRepository = cityRepository;
         this.companyRepository = companyRepository;
-        this.companiesRepository = companiesRepository;
+        this.regionRepository = regionRepository;
         this.competitorRepository = competitorRepository;
+        this.userRepository = userRepository;
     }
     public SendMessage startRegistrationProcess(Update update) {
 
@@ -126,7 +140,7 @@ public class RegistrationService {
         state.getCompetitorModel().setGender(update.getCallbackQuery().getData().charAt(0));
         state.setRegistrationStep(MenuStep.REGION);
 
-        var regionsOptional = companiesRepository.findAllRegions();
+        var regionsOptional = regionRepository.findAllRegions();
 
         if (regionsOptional.isPresent()) {
             List<ModelBase> regions = new ArrayList<>(regionsOptional.get());
@@ -143,11 +157,13 @@ public class RegistrationService {
         state.setRegionId(regionId);
         state.setRegistrationStep(MenuStep.CITY);
 
-        var citiesOptional = companiesRepository.findAllCities(regionId);
+        var citiesOptional = cityRepository.findAllCities(regionId);
 
         if (citiesOptional.isPresent()) {
-            List<ModelBase> cities = new ArrayList<>(citiesOptional.get());
-            var markup = MarkupHandler.collectionMarkup(cities);
+            List<Cities> cities = new ArrayList<>(citiesOptional.get());
+
+
+            var markup = MarkupHandler.collectionMarkup(cities.stream().map(Mapper::toCityModel).collect(Collectors.toList()));
             message.setReplyMarkup(markup);
         }
 
@@ -160,10 +176,10 @@ public class RegistrationService {
         state.setCityId(cityId);
         state.setRegistrationStep(MenuStep.COMPANY);
 
-        var companiesOptional = companiesRepository.findAllCompanies(cityId);
+        var companiesOptional = companyRepository.findAllCompanies(cityId);
         if (companiesOptional.isPresent()) {
-            List<ModelBase> companies = new ArrayList<>(companiesOptional.get());
-            var markup = MarkupHandler.collectionMarkup(companies);
+            List<Companies> companies = new ArrayList<>(companiesOptional.get());
+            var markup = MarkupHandler.collectionMarkup(companies.stream().map(Mapper::toCompanyModel).collect(Collectors.toList()));
             message.setReplyMarkup(markup);
         }
 
@@ -173,7 +189,7 @@ public class RegistrationService {
 
     private SendMessage setCompetitorCompany(SendMessage message, Update update, BotState state) {
         int companyId = Integer.parseInt(update.getCallbackQuery().getData());
-        Optional<CompanyModel> company = companyRepository.findById(companyId);
+        Optional<Companies> company = companyRepository.findById(companyId);
 
         company.ifPresent(u -> state.getCompetitorModel().setCompany(u.getName()));
         state.setRegistrationStep(MenuStep.COMPETITION_TYPE);
@@ -197,6 +213,12 @@ public class RegistrationService {
         state.setCurrentCommandType(ActiveCommandType.DEFAULT);
 
         String name = competitor.getName();
+
+        var currentUser = userRepository.findById(competitor.getTelegramId()).get();
+        if(!currentUser.getName().equals(name)) {
+            currentUser.setName(name);
+            userRepository.save(currentUser);
+        }
 
         message.setText(String.format("%s, вы успешно зарегистрировались на участе в событии: %s", name, competitionType));
         return message;

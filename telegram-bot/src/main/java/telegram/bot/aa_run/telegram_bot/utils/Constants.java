@@ -1,6 +1,9 @@
 package telegram.bot.aa_run.telegram_bot.utils;
 
 import jakarta.servlet.http.PushBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 public abstract class Constants {
 

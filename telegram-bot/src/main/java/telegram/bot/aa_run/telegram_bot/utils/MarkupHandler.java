@@ -1,5 +1,6 @@
 package telegram.bot.aa_run.telegram_bot.utils;
 
+import org.springframework.lang.Nullable;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -7,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import telegram.bot.aa_run.telegram_bot.models.abstractions.ModelBase;
 import telegram.bot.aa_run.telegram_bot.models.enums.CompetitionType;
+import telegram.bot.aa_run.telegram_bot.models.enums.UserStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,19 +71,66 @@ public class MarkupHandler {
         return row;
     }
 
-    public static ReplyKeyboardMarkup getBasicReplyMarkup() {
+    public static ReplyKeyboardMarkup getBasicReplyMarkup(@Nullable UserStatus userStatus) {
         ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
 
         KeyboardRow row1 = new KeyboardRow();
         row1.add(new KeyboardButton("/register"));
         row1.add(new KeyboardButton("/help"));
 
-        keyboard.setKeyboard(List.of(row1));
+
+
+        if(userStatus.equals((UserStatus.ADMIN))) {
+            KeyboardRow row2 = new KeyboardRow();
+
+            row2.add(new KeyboardButton("/Управление"));
+            //row2.add(new KeyboardButton("/stat"));
+
+            keyboard.setKeyboard(List.of(row1, row2));
+            keyboard.setKeyboard(List.of(row1, row2));
+        }
+        else {
+            keyboard.setKeyboard(List.of(row1));
+        }
+
 
         keyboard.setResizeKeyboard(true);
         keyboard.setOneTimeKeyboard(true);
         keyboard.setSelective(true);
 
+        return keyboard;
+    }
+
+    public static ReplyKeyboardMarkup getControlReplyMarkup(@Nullable UserStatus userStatus) {
+
+        ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
+
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add(new KeyboardButton("/register"));
+        row1.add(new KeyboardButton("/help"));
+
+        if(userStatus.equals((UserStatus.ADMIN))) {
+
+            KeyboardRow row2 = new KeyboardRow();
+            row2.add(new KeyboardButton("/СообщениеГруппе"));
+            row2.add(new KeyboardButton("/stat"));
+
+            KeyboardRow row3 = new KeyboardRow();
+            row3.add(new KeyboardButton("/СообщУчасчтнику"));
+            row3.add(new KeyboardButton("/СообщВсем"));
+
+            KeyboardRow row4 = new KeyboardRow();
+            row4.add(new KeyboardButton("/Редактировать"));
+            row4.add(new KeyboardButton("/Удалить"));
+
+            KeyboardRow row5 = new KeyboardRow();
+            row5.add(new KeyboardButton("/СкрытьКнопки"));
+
+            keyboard.setKeyboard(List.of(row2, row3, row4, row5));
+        }
+        else {
+            keyboard.setKeyboard(List.of(row1));
+        }
         return keyboard;
     }
 }

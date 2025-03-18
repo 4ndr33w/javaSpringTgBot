@@ -17,15 +17,6 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "bot.commands")
 public class CommandProperties {
 
-
-    private static final Map<String, CommandConfig> commands = new HashMap<String, CommandConfig>() {
-        {
-            put("/start", new CommandConfig("CommandProperties", "Bot Greetings Message from CommandProperties"));
-            put("/help", new CommandConfig("Помощь!!", "Список доступных команд"));
-            put("/register", new CommandConfig("Регистрация", "Введите ваши имя и вамилию:"));
-        }
-    };
-
     List<BotCommand> menuCommandList = new ArrayList<BotCommand> () {
         {
             add(new BotCommand("/start", "Начало работы бота"));
@@ -35,30 +26,4 @@ public class CommandProperties {
         }
     };
     public SetMyCommands setMyCommands = SetMyCommands.builder().commands(menuCommandList).build();
-
-    public static Map<String, CommandConfig> getCommands() {
-        return commands;
-    }
-    public static class CommandConfig {
-        private String description;
-        private String responseMessage;
-
-        public CommandConfig(String s, String s1) {
-            this.description = s;
-            this.responseMessage = s1;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-        public void setDescription(String description) {
-            this.description = description;
-        }
-        public String getResponseMessage() {
-            return responseMessage;
-        }
-        public void setResponseMessage(String responseMessage) {
-            this.responseMessage = responseMessage;
-        }
-    }
 }

@@ -9,3 +9,5 @@ src/main/resources/data.sql
 src/main/resources/application.properties
 src/main/resources/application.yaml
 src/main/resources/telegram/start.txt
+src/main/resources/constantsDictionary.properties
+database.db

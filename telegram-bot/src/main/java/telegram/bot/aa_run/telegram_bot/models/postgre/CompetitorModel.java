@@ -1,4 +1,4 @@
-package telegram.bot.aa_run.telegram_bot.models;
+package telegram.bot.aa_run.telegram_bot.models.postgre;
 
 import java.util.Date;
 

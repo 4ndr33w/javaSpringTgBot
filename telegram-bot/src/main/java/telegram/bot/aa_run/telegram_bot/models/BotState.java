@@ -1,6 +1,7 @@
 package telegram.bot.aa_run.telegram_bot.models;
 
 import telegram.bot.aa_run.telegram_bot.models.enums.*;
+import telegram.bot.aa_run.telegram_bot.models.postgre.CompetitorModel;
 
 public class BotState {
 
