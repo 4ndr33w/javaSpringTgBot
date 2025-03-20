@@ -108,6 +108,10 @@ public class MessageService {
     }
 
     private SendMessage cancelAction(long chatId) {
+
+        var state = CommandHandler.botState.get(chatId);
+        state.setMenuStep(MenuStep.DEFAULT);
+        state.setCurrentCommandType(ActiveCommandType.DEFAULT);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
         sendMessage.setText("Отмена");
