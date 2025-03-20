@@ -57,12 +57,12 @@ public class RegistrationService {
         if(existingCompetitor.isPresent()) {
 
             state.setCurrentCommandType(ActiveCommandType.DEFAULT);
-            state.setRegistrationStep(MenuStep.DEFAULT);
+            state.setMenuStep(MenuStep.DEFAULT);
             String name = existingCompetitor.get().getName();
             String competitionType = UtilClass.getEventTypeDescription(existingCompetitor.get().getCompetitionType());
             return new SendMessage(String.valueOf(chatId), String.format("%s, Вы уже зарегистрированы. \nВы выбрали участие в событии: \n`%s`", name, competitionType));
         }
-        state.setRegistrationStep(MenuStep.NAME);
+        state.setMenuStep(MenuStep.NAME);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
         sendMessage.setText("Введите фамилию и имя");
@@ -76,7 +76,7 @@ public class RegistrationService {
 
         message.setChatId(String.valueOf(chatId));
         var state = CommandHandler.botState.get(chatId);
-        switch (state.getRegistrationStep()) {
+        switch (state.getMenuStep()) {
             case NAME -> {
                 return setCompetitorName(message, update, state);
             }
@@ -119,7 +119,7 @@ public class RegistrationService {
         user.setName(update.getMessage().getText());
 
         state.setCompetitorModel(user);
-        state.setRegistrationStep(MenuStep.AGE);
+        state.setMenuStep(MenuStep.AGE);
 
         message.setChatId(String.valueOf(chatId));
         message.setText("Введите возраст");
@@ -128,7 +128,7 @@ public class RegistrationService {
 
     private SendMessage setCompetitorAge(SendMessage message, Update update, BotState state) {
         state.getCompetitorModel().setAge(Integer.parseInt(update.getMessage().getText()));
-        state.setRegistrationStep(MenuStep.GENDER);
+        state.setMenuStep(MenuStep.GENDER);
 
         String userName = state.getCompetitorModel().getName();
         message.setText(String.format("%s, укажите ваш пол", userName));
@@ -138,7 +138,7 @@ public class RegistrationService {
 
     private SendMessage setCompetitorGender(SendMessage message, Update update, BotState state) {
         state.getCompetitorModel().setGender(update.getCallbackQuery().getData().charAt(0));
-        state.setRegistrationStep(MenuStep.REGION);
+        state.setMenuStep(MenuStep.REGION);
 
         var regionsOptional = regionRepository.findAllRegions();
 
@@ -155,7 +155,7 @@ public class RegistrationService {
     private SendMessage setCompetitorRegion(SendMessage message, Update update, BotState state) {
         int regionId = Integer.parseInt(update.getCallbackQuery().getData());
         state.setRegionId(regionId);
-        state.setRegistrationStep(MenuStep.CITY);
+        state.setMenuStep(MenuStep.CITY);
 
         var citiesOptional = cityRepository.findAllCities(regionId);
 
@@ -174,7 +174,7 @@ public class RegistrationService {
     private SendMessage setCompetitorCity(SendMessage message, Update update, BotState state) {
         int cityId = Integer.parseInt(update.getCallbackQuery().getData());
         state.setCityId(cityId);
-        state.setRegistrationStep(MenuStep.COMPANY);
+        state.setMenuStep(MenuStep.COMPANY);
 
         var companiesOptional = companyRepository.findAllCompanies(cityId);
         if (companiesOptional.isPresent()) {
@@ -192,7 +192,7 @@ public class RegistrationService {
         Optional<Companies> company = companyRepository.findById(companyId);
 
         company.ifPresent(u -> state.getCompetitorModel().setCompany(u.getName()));
-        state.setRegistrationStep(MenuStep.COMPETITION_TYPE);
+        state.setMenuStep(MenuStep.COMPETITION_TYPE);
 
         var markup = MarkupHandler.eventTypeMarkup();
         message.setReplyMarkup(markup);
@@ -209,7 +209,7 @@ public class RegistrationService {
         competitor.setCreatedAt(new Date());
         competitor.setUpdatedAt(new Date());
         competitorRepository.save(competitor);
-        state.setRegistrationStep(MenuStep.DEFAULT);
+        state.setMenuStep(MenuStep.DEFAULT);
         state.setCurrentCommandType(ActiveCommandType.DEFAULT);
 
         String name = competitor.getName();

@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import telegram.bot.aa_run.telegram_bot.models.CallbackModel;
 import telegram.bot.aa_run.telegram_bot.models.enums.CallbackType;
+import telegram.bot.aa_run.telegram_bot.services.MessageService;
 import telegram.bot.aa_run.telegram_bot.services.RegistrationService;
 import telegram.bot.aa_run.telegram_bot.telegram.callbacks.EventCallback;
 import telegram.bot.aa_run.telegram_bot.telegram.callbacks.interfaces.Callback;
@@ -19,10 +20,12 @@ import static telegram.bot.aa_run.telegram_bot.telegram.handlers.CommandHandler.
 public class CallbackHandler {
 
     private final RegistrationService registrationService;
+    private final MessageService messageService;
 
-    public CallbackHandler(RegistrationService registrationService) {
+    public CallbackHandler(RegistrationService registrationService, MessageService messageService) {
 
         this.registrationService = registrationService;
+        this.messageService = messageService;
     }
 
 
@@ -44,6 +47,9 @@ public class CallbackHandler {
             }
             case HELP: {
                 break;
+            }
+            case MESSAGE_TO_ALL: {
+                return messageService.messageHandler(update);
             }
         }
         return null;

@@ -16,21 +16,10 @@ import java.util.List;
 public class MarkupHandler {
 
     public static InlineKeyboardMarkup genderMarkup() {
-
-        String maleText = "мужчина";
-        String femaleText = "женщина";
-
-        InlineKeyboardButton maleButton = new InlineKeyboardButton();
-        maleButton.setText(maleText);
-        maleButton.setCallbackData("male");
-
-        InlineKeyboardButton femaleButton = new InlineKeyboardButton();
-        femaleButton.setText(femaleText);
-        femaleButton.setCallbackData("female");
-
         List<InlineKeyboardButton> row = new ArrayList<>();
-        row.add(maleButton);
-        row.add(femaleButton);
+
+        row.add(addNewInlineButton("мужчина", "male"));
+        row.add(addNewInlineButton("женщина", "female"));
 
         return new InlineKeyboardMarkup(List.of(row));
     }
@@ -71,6 +60,13 @@ public class MarkupHandler {
         return row;
     }
 
+    private static InlineKeyboardButton addNewInlineButton(String text, String callbackData) {
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(text);
+        button.setCallbackData(callbackData);
+        return button;
+    }
+
     public static ReplyKeyboardMarkup getBasicReplyMarkup(@Nullable UserStatus userStatus) {
         ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
 
@@ -78,13 +74,10 @@ public class MarkupHandler {
         row1.add(new KeyboardButton("/register"));
         row1.add(new KeyboardButton("/help"));
 
-
-
         if(userStatus.equals((UserStatus.ADMIN))) {
             KeyboardRow row2 = new KeyboardRow();
 
             row2.add(new KeyboardButton("/Управление"));
-            //row2.add(new KeyboardButton("/stat"));
 
             keyboard.setKeyboard(List.of(row1, row2));
             keyboard.setKeyboard(List.of(row1, row2));
@@ -92,8 +85,6 @@ public class MarkupHandler {
         else {
             keyboard.setKeyboard(List.of(row1));
         }
-
-
         keyboard.setResizeKeyboard(true);
         keyboard.setOneTimeKeyboard(true);
         keyboard.setSelective(true);
@@ -132,5 +123,14 @@ public class MarkupHandler {
             keyboard.setKeyboard(List.of(row1));
         }
         return keyboard;
+    }
+
+    public static InlineKeyboardMarkup getContinueOrCancelMarkup() {
+        List<InlineKeyboardButton> row = new ArrayList<>();
+
+        row.add(addNewInlineButton("Продолжить", "continue"));
+        row.add(addNewInlineButton("Отмена", "cancel"));
+
+        return new InlineKeyboardMarkup(List.of(row));
     }
 }

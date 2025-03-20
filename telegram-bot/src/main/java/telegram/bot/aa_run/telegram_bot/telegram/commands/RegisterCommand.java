@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import telegram.bot.aa_run.telegram_bot.models.BotState;
 import telegram.bot.aa_run.telegram_bot.models.enums.ActiveCommandType;
 import telegram.bot.aa_run.telegram_bot.models.enums.MenuStep;
-import telegram.bot.aa_run.telegram_bot.models.enums.UserStatus;
 import telegram.bot.aa_run.telegram_bot.repositories.postgre.CompetitorRepository;
 import telegram.bot.aa_run.telegram_bot.repositories.sqlite.UserRepository;
 import telegram.bot.aa_run.telegram_bot.services.RegistrationService;
@@ -35,7 +34,7 @@ public class RegisterCommand implements Command {
 
         if(state == null) {
             state = new BotState();
-            state.setRegistrationStep(MenuStep.DEFAULT);
+            state.setMenuStep(MenuStep.DEFAULT);
             CommandHandler.botState.put(chatId, state);
         }
         state.setCurrentCommandType(ActiveCommandType.REGISTRATION);

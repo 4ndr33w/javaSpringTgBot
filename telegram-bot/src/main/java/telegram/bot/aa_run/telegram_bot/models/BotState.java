@@ -18,10 +18,10 @@ public class BotState {
     public void setCurrentCommandType(ActiveCommandType currentCommandType) {
         this.currentCommandType = currentCommandType;
     }
-    public MenuStep getRegistrationStep() {
+    public MenuStep getMenuStep() {
         return menuStep;
     }
-    public void setRegistrationStep(MenuStep menuStep) {
+    public void setMenuStep(MenuStep menuStep) {
         this.menuStep = menuStep;
     }
     public CompetitorModel getCompetitorModel() {
