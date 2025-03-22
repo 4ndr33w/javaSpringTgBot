@@ -63,7 +63,7 @@ public class CommandHandler {
         this.commands.put("/редактир", editUserCommand);
         this.commands.put("/СкрытьКнопки", hideControlButtonsCommand);
         this.commands.put("/СообщВсем", sendMessageToAllCommand);
-        this.commands.put("/сообщениеГруппе", sendMessageToGroupCommand);
+        this.commands.put("/СообщениеГруппе", sendMessageToGroupCommand);
         this.commands.put("/сообщУчастнику", sendMessageToUserCommand);
         this.commands.put("/setAdminToUser", setAdminToUserCommand);
         this.commands.put("/setUserToAdmin", setUserToAdminCommand);
@@ -122,7 +122,7 @@ public class CommandHandler {
             case HELP: {
                 break;
             }
-            case MESSAGE_TO_ALL: {
+            case MESSAGE_TO_ALL, MESSAGE_TO_GROUP: {
                 return messageService.messageHandler(update);
             }
         }

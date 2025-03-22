@@ -105,8 +105,15 @@ public class TelegramBot extends TelegramLongPollingBot {
                 var isCurrentStateMessageToAll = state.getCurrentCommandType().equals(ActiveCommandType.MESSAGE_TO_ALL);
                 var isCurrentStateStartAction = state.getMenuStep().equals(MenuStep.START_ACTION);
 
+                var isCurrentStateMessageToGroup = state.getCurrentCommandType().equals(ActiveCommandType.MESSAGE_TO_GROUP);
+
                 if(isCurrentStateMessageToAll && isCurrentStateStartAction) {
                     List<CompetitorModel> competitors = competitorRepository.findAll();
+                    sendMessageToAll(state, update, competitors);
+                }
+                if(isCurrentStateMessageToGroup && isCurrentStateStartAction) {
+                    var competitionType = state.getCompetitionType();
+                    var competitors = competitorRepository.findByCompetitionType(competitionType).get();
                     sendMessageToAll(state, update, competitors);
                 }
                 else {
@@ -136,24 +143,32 @@ public class TelegramBot extends TelegramLongPollingBot {
         final int DELAY_BETWEEN_MESSAGES = 3000;
 
         String adminWhoSendMessageId = sendMessage.getChatId();
-        execute(sendMessage);
 
-        String messageText ="Сообщение от администратора:\n"  + sendMessage.getText();
-        for (Long competitorId : chatIds) {
-            sendMessage.setChatId(String.valueOf(competitorId));
+        if(chatIds.size() <1) {
+            sendMessage.setText("В группе нет участников");
+            execute(sendMessage);
+        }
+        else  {
+            execute(sendMessage);
 
-            try {
-                Thread.sleep(DELAY_BETWEEN_MESSAGES);
+            String messageText ="Сообщение от администратора:\n"  + sendMessage.getText();
+            for (Long competitorId : chatIds) {
+                sendMessage.setChatId(String.valueOf(competitorId));
 
-                sendMessage.setText(messageText);
-                execute(sendMessage);
+                try {
+                    Thread.sleep(DELAY_BETWEEN_MESSAGES);
 
-            } catch (InterruptedException | TelegramApiException e) {
-                sendMessage.setChatId(adminWhoSendMessageId);
-                execute(sendMessage);
-                e.printStackTrace();
+                    sendMessage.setText(messageText);
+                    execute(sendMessage);
+
+                } catch (InterruptedException | TelegramApiException e) {
+                    sendMessage.setChatId(adminWhoSendMessageId);
+                    execute(sendMessage);
+                    e.printStackTrace();
+                }
             }
         }
+
     }
 
     private void sendMessageToAll(BotState state, Update update, List<CompetitorModel> competitors) {

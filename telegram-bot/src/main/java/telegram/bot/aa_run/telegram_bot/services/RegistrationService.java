@@ -194,7 +194,7 @@ public class RegistrationService {
         company.ifPresent(u -> state.getCompetitorModel().setCompany(u.getName()));
         state.setMenuStep(MenuStep.COMPETITION_TYPE);
 
-        var markup = MarkupHandler.eventTypeMarkup();
+        var markup = MarkupHandler.getEventTypeMarkup();
         message.setReplyMarkup(markup);
         message.setText(String.format("%s - %s, выберите событие, в котором желаете принять участие", state.getCompetitorModel().getName(), state.getCompetitorModel().getCompany()));
         return message;

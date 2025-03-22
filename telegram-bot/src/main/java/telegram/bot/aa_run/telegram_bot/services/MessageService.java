@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import telegram.bot.aa_run.telegram_bot.models.BotState;
 import telegram.bot.aa_run.telegram_bot.models.enums.ActiveCommandType;
+import telegram.bot.aa_run.telegram_bot.models.enums.CompetitionType;
 import telegram.bot.aa_run.telegram_bot.models.enums.MenuStep;
 import telegram.bot.aa_run.telegram_bot.models.postgre.CompetitorModel;
 import telegram.bot.aa_run.telegram_bot.repositories.postgre.CompetitorRepository;
@@ -30,23 +31,20 @@ public class MessageService {
         long chatId = getChatId(update);
         BotState state = CommandHandler.botState.get(chatId);
 
-        switch (state.getMenuStep()) {
-            case DEFAULT: {
+        return switch (state.getMenuStep()) {
+            case DEFAULT -> {
                 String message = getMessageText(state);
-                return confirmActionRequest(update, message);
+                yield confirmActionRequest(update, message);
             }
-            case CONFIRM_ACTION: {
-                return requestActionCallbackQuery(update);
-            }
-            case REQUEST_ACTION: {
+            case CONFIRM_ACTION -> requestActionCallbackQuery(update);
+            case REQUEST_ACTION -> {
                 String message = getMessageText(state);
-                return continueAction(update, message);
+                yield continueAction(update, message);
             }
-            case START_ACTION: {
-                return startAction(update);
-            }
-        }
-        return null;
+            case REQUEST_GROUP_ACTION -> groupSelectAction(update);
+            case START_ACTION -> startAction(update);
+            default -> null;
+        };
     }
 
     private long getChatId(Update update) {
@@ -89,15 +87,45 @@ public class MessageService {
     private SendMessage continueAction(Update update, String requestMessage) {
         long chatId = getChatId(update);
         BotState state = CommandHandler.botState.get(chatId);
-        state.setMenuStep(MenuStep.START_ACTION);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText(requestMessage);
 
+        if(state.getCurrentCommandType().equals(ActiveCommandType.MESSAGE_TO_ALL)) {
+            state.setMenuStep(MenuStep.START_ACTION);
+            sendMessage.setText(requestMessage);
+        }
+
+        if(state.getCurrentCommandType().equals(ActiveCommandType.MESSAGE_TO_GROUP)) {
+            state.setMenuStep(MenuStep.REQUEST_GROUP_ACTION);
+            sendMessage.setText(requestMessage);
+            sendMessage.setReplyMarkup(MarkupHandler.getEventTypeMarkup());
+        }
         return sendMessage;
     }
 
+    private SendMessage groupSelectAction(Update update) {
+        long chatId = getChatId(update);
+        BotState state = CommandHandler.botState.get(chatId);
+        var callback = update.getCallbackQuery().getData();
 
+        CompetitionType eventType = Enum.valueOf(CompetitionType.class, callback);
+        state.setCompetitionType(eventType);
+        state.setMenuStep(MenuStep.START_ACTION);
+
+        var competitors = competitorRepository.findByCompetitionType(eventType);
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(chatId));
+        if(competitors.get().isEmpty()) {
+            sendMessage.setText("В группе нет участников");
+            state.setMenuStep(MenuStep.DEFAULT);
+            state.setCurrentCommandType(ActiveCommandType.DEFAULT);
+        }
+        else  {
+            sendMessage.setText("Введите сообщение");
+        }
+        return sendMessage;
+    }
 
     public SendMessage startAction(Update update) {
         SendMessage sendMessage = new SendMessage();
@@ -123,6 +151,9 @@ public class MessageService {
         if(state.getMenuStep().equals(MenuStep.CONFIRM_ACTION)) {
             return "Введите сообщение";
         }
+        if(state.getMenuStep().equals(MenuStep.REQUEST_GROUP_ACTION)) {
+            return "Выберите группу";
+        }
         else {
             switch (state.getCurrentCommandType()) {
                 case MESSAGE_TO_ALL: {
@@ -134,6 +165,9 @@ public class MessageService {
 
                     }
                     return "Отправить сообщение всем участникам.\nПродолжить?";
+                }
+                case MESSAGE_TO_GROUP:{
+                    return "Отправить сообщение группе участников.\nПродолжить?";
                 }
                 default:{
                     return "";
@@ -150,6 +184,5 @@ public class MessageService {
         else {
             return null;
         }
-
     }
 }

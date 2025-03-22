@@ -12,6 +12,7 @@ public enum MenuStep {
 
     CONFIRM_ACTION,
     REQUEST_ACTION,
+    REQUEST_GROUP_ACTION,
     START_ACTION,
 
     NAME_REQUEST,

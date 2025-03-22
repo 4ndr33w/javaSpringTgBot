@@ -11,6 +11,7 @@ public class BotState {
 
     private int regionId;
     private int cityId;
+    private CompetitionType competitionType;
 
     public ActiveCommandType getCurrentCommandType() {
         return currentCommandType;
@@ -41,5 +42,11 @@ public class BotState {
     }
     public void setCityId(int cityId) {
         this.cityId = cityId;
+    }
+    public CompetitionType getCompetitionType() {
+        return competitionType;
+    }
+    public void setCompetitionType(CompetitionType competitionType) {
+        this.competitionType = competitionType;
     }
 }

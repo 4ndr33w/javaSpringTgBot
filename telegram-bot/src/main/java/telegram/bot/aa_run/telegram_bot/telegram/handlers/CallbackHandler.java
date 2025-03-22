@@ -48,9 +48,10 @@ public class CallbackHandler {
             case HELP: {
                 break;
             }
-            case MESSAGE_TO_ALL: {
+            case MESSAGE_TO_ALL, MESSAGE_TO_GROUP: {
                 return messageService.messageHandler(update);
             }
+
         }
         return null;
     }

@@ -35,7 +35,7 @@ public class MarkupHandler {
         return markup;
     }
 
-    public static InlineKeyboardMarkup eventTypeMarkup() {
+    public static InlineKeyboardMarkup getEventTypeMarkup() {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
